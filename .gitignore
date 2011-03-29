@@ -1,2 +1,5 @@
 .emacs.*
 *~
+target
+lib_managed
+project/boot
