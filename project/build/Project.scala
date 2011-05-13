@@ -23,6 +23,7 @@ class CuminoProject(info: ProjectInfo) extends DefaultProject(info)
   Credentials(Path.userHome / ".ivy2" / ".credentials", log)
 
   val riReleases = "RI Releases" at "http://maven.research-infrastructures.eu/nexus/content/repositories/releases"
+  val riSnapshots = "RI Snapshots" at "http://maven.research-infrastructures.eu/nexus/content/repositories/snapshots"
   val scalaToolsSnapshots = "Scala-Tools Maven2 Snapshots Repository" at "http://scala-tools.org/repo-snapshots"
   val scalaToolsReleases = "Scala-Tools Maven2 Release Repository" at "http://scala-tools.org/repo-releases"
 
@@ -47,16 +48,21 @@ class CuminoProject(info: ProjectInfo) extends DefaultProject(info)
     ScalaInstance(si.version, si.libraryJar, si.compilerJar, info.launcher, extra: _*)
 
   // testing 
-  val specsdep = "org.scala-tools.testing" %% "specs" % "1.6.7.2" % "test->default"
+//  val specsdep = "org.scala-tools.testing" %% "specs" % "1.6.7.2" % "test->default"
+  val specs2 = "org.specs2" %% "specs2" % "1.3"
+  def specs2Framework = new TestFramework("org.specs2.runner.SpecsFramework")
+  override def testFrameworks = super.testFrameworks ++ Seq(specs2Framework)
+
   val mockito = "org.mockito" % "mockito-all" % "1.8.5"
 
-  val metrics = "com.yammer" %% "metrics" % "1.0.7" withSources ()
+  val metrics = "com.yammer.metrics" %% "metrics-core" % "2.0.0-BETA13-SNAPSHOT" withSources ()
+
   val guice = "com.google.inject" % "guice" % "3.0-rc2"
   val guiceScala = "uk.me.lings" % "scala-guice_2.8.0" % "0.1"
 
   val configgy = "net.lag" % "configgy" % "2.0.0" % "compile" //ApacheV2
-  val scopt = "eed3si9n" %% "scopt" % "1.0"
-  val scalaArm = "com.github.jsuereth.scala-arm" %% "scala-arm" % "0.2"
+  val scopt = "com.github.scopt" %% "scopt" % "1.0.0-SNAPSHOT"
+  val scalaArm = "com.github.jsuereth.scala-arm" %% "scala-arm" % "0.3-SNAPSHOT"
 
   val hadoop = "org.apache.hadoop" % "hadoop-core" % "0.20.2"
 
