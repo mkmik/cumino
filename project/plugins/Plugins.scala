@@ -8,8 +8,10 @@ class Plugins(info: ProjectInfo) extends PluginDefinition(info) {
 
   val cxDoccoPlugin = "com.github.philcali" % "sbt-cx-docco" % "0.0.1"
 
-  val jcoffescript = "org.jcoffeescript" % "jcoffeescript" % "1.0" from "http://cloud.github.com/downloads/yeungda/jcoffeescript/jcoffeescript-1.0.jar"
+  val jcoffescript = "org.jcoffeescript" % "jcoffeescript" % "1.1" from "http://cloud.github.com/downloads/yeungda/jcoffeescript/jcoffeescript-1.1.jar"
 
+  val coffeeScriptSbtRepo = "coffeeScript sbt repo" at "http://repo.coderlukes.com"
+  val coffeeScript = "org.coffeescript" % "coffee-script-sbt-plugin" % "1.0"
 
 }			
 	
