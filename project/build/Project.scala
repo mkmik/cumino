@@ -2,10 +2,14 @@ import sbt._
 import reaktor.scct.ScctProject
 
 import xsbt.ScalaInstance
-
+import org.coffeescript.CoffeeScriptCompile
 import java.io.File
 
-class CuminoProject(info: ProjectInfo) extends DefaultProject(info) with AssemblyProject with ScctProject with AutoCompilerPlugins {
+class CuminoProject(info: ProjectInfo) extends DefaultProject(info) 
+  with AssemblyProject with ScctProject with AutoCompilerPlugins with DoccoSingle 
+  with CoffeeScriptCompile
+{
+
   val log4j = "log4j" % "log4j" % "1.2.16"
 
   //val scromiumRepo = "Cliff's Scromium Repo" at "http://cliffmoon.github.com/scromium/repository/"
