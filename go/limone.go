@@ -6,7 +6,7 @@ import (
 	"fmt"
 )
 
-var omitNewline = flag.Bool("n", false, "don't print final newline")
+var port = flag.Int("p", 5873, "port")
 
 var Usage = func() {
     fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
@@ -15,7 +15,5 @@ var Usage = func() {
 func main() {
 	flag.Parse()
 
-	if !*omitNewline {
-		println("ok")
-	}
+	fmt.Printf("port %d\n", *port)
 }
