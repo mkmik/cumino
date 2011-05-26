@@ -9,3 +9,4 @@ project/plugins/src_managed/
 *.o
 _obj
 go/limone
+_cgo_export.h

@@ -1,9 +1,13 @@
-include $(GOROOT)/src/Make.inc
+all:
+	rm -f _obj/_*
+	$(MAKE) -f Makefile.common XENVERSION=3.0
+	rm -f _obj/_*
+	$(MAKE) -f Makefile.common XENVERSION=3.4
+	rm -f _obj/_*
+	$(MAKE) -f Makefile.common XENVERSION=4.0
 
-TARG=vimini/xen
-GOFILES=domain.go
-CGOFILES=xen.go
-CGO_CFLAGS=-I../../../c/xen/include
-CGO_LDFLAGS=-L../../../c/xen/lib -lxenctrl -lxenstore
 
-include $(GOROOT)/src/Make.pkg
+clean:
+	$(MAKE) -f Makefile.common XENVERSION=3.0 clean
+	$(MAKE) -f Makefile.common XENVERSION=3.4 clean
+	$(MAKE) -f Makefile.common XENVERSION=4.0 clean
