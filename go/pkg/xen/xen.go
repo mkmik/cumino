@@ -42,9 +42,7 @@ func (this *xen_handle) List() []Domain {
 	return domains
 }
 
-func (this *xen_handle) Name(id int) string {
-	path := fmt.Sprintf("/local/domain/%d/name", id)
-
+func (this *xen_handle) Read(path string) string {
   p := C.CString(path)
   defer C.free(unsafe.Pointer(p))
 	var len C.uint
@@ -53,4 +51,9 @@ func (this *xen_handle) Name(id int) string {
 	defer C.free(cname)
 
 	return C.GoString(C.castToString(cname))
+}
+
+func (this *xen_handle) Name(id int) string {
+	path := fmt.Sprintf("/local/domain/%d/name", id)
+	return this.Read(path)
 }
