@@ -6,7 +6,7 @@ import org.coffeescript.CoffeeScriptCompile
 import java.io.File
 
 class CuminoProject(info: ProjectInfo) extends DefaultProject(info) 
-  with AssemblyProject with ScctProject with AutoCompilerPlugins with DoccoSingle 
+  with AssemblyProject with ScctProject with /* AutoCompilerPlugins  with */ DoccoSingle 
   with CoffeeScriptCompile
 {
 
@@ -17,6 +17,7 @@ class CuminoProject(info: ProjectInfo) extends DefaultProject(info)
   //	val codaRepo = "Coda Hale's Repository" at "http://repo.codahale.com/"
   //val scromium = "scromium" % "scromium_2.8.0" % "0.6.4" // artifacts Artifact("scromium-all_2.8.0", "all", "jar")
 
+
   override def managedStyle = ManagedStyle.Maven
 
   lazy val publishTo = Resolver.url("RI Releases", new java.net.URL("http://maven.research-infrastructures.eu/nexus/content/repositories/snapshots/"))
@@ -26,6 +27,8 @@ class CuminoProject(info: ProjectInfo) extends DefaultProject(info)
   val riSnapshots = "RI Snapshots" at "http://maven.research-infrastructures.eu/nexus/content/repositories/snapshots"
   val scalaToolsSnapshots = "Scala-Tools Maven2 Snapshots Repository" at "http://scala-tools.org/repo-snapshots"
   val scalaToolsReleases = "Scala-Tools Maven2 Release Repository" at "http://scala-tools.org/repo-releases"
+  val AkkaRepo = MavenRepository("Akka Repository", "http://akka.io/repository")
+
 
   val codaRepo = "Coda Hale's Repository" at "http://repo.codahale.com/"
   val fuseRepo = "fuse repo" at "http://repo.fusesource.com/maven2-all/"
@@ -34,6 +37,8 @@ class CuminoProject(info: ProjectInfo) extends DefaultProject(info)
 
   // avro
   val radlabRepo = "Radlab Repository" at "http://scads.knowsql.org/nexus/content/groups/public/"
+
+  /*
   val avroScala = compilerPlugin("com.googlecode" % "avro-scala-compiler-plugin" % "1.1-SNAPSHOT")
   val pluginRuntime = "com.googlecode" % "avro-scala-compiler-plugin" % "1.1-SNAPSHOT"
   val avro = "org.apache.hadoop" % "avro" % "1.3.3"
@@ -46,6 +51,7 @@ class CuminoProject(info: ProjectInfo) extends DefaultProject(info)
 
   def withExtraJars(si: ScalaInstance, extra: Seq[File]) =
     ScalaInstance(si.version, si.libraryJar, si.compilerJar, info.launcher, extra: _*)
+    */
 
   // testing 
 //  val specsdep = "org.scala-tools.testing" %% "specs" % "1.6.7.2" % "test->default"
@@ -65,6 +71,9 @@ class CuminoProject(info: ProjectInfo) extends DefaultProject(info)
   val scalaArm = "com.github.jsuereth.scala-arm" %% "scala-arm" % "0.3-SNAPSHOT"
 
   val hadoop = "org.apache.hadoop" % "hadoop-core" % "0.20.2"
+
+  val flange = "com.force.doozer" %% "flange" % "1.0-SNAPSHOT"
+
 
   override def mainClass = Some("it.cnr.cumino.Main")
 }

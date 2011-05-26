@@ -6,4 +6,6 @@ project/boot
 project/plugins/project/
 project/plugins/src_managed/
 *.6
+*.o
+_obj
 go/limone
