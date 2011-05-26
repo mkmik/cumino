@@ -3,6 +3,15 @@
 if [ -d /usr/lib/xen-3.0.3-1 ]; then 
     XENVERSION=3.0 
     export LD_LIBRARY_PATH=/usr/lib/xen-3.0.3-1/lib
+elif [ -d /usr/lib/xen-3.2-1/ ]; then
+    if [ ! -d /tmp/.vimini-libs ]; then
+        mkdir /tmp/.vimini-libs
+        cp /usr/lib/xen-3.2-1/lib/libxenctrl.so /tmp/.vimini-libs/libxenctrl.so.3.2
+    fi 
+    export LD_LIBRARY_PATH=/tmp/.vimini-libs
+    XENVERSION=3.2 
+elif [ -f /usr/lib/libxenctrl.so.3.2 ]; then
+    XENVERSION=3.2 
 elif [ -f /usr/lib/libxenctrl.so.3.4 ]; then
     XENVERSION=3.4 
 elif [ -d /usr/lib/xen-4.0 ]; then
