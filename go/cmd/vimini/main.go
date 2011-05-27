@@ -12,8 +12,8 @@ func main() {
 
 	physInfo := handle.PhysInfo()
 
-	fmt.Printf("total memory %d\n", int64(physInfo.TotalPages) * 4096)
-	fmt.Printf("free memory %d\n", int64(physInfo.FreePages) * 4096)
+	fmt.Printf("total memory %s\n", xen.ByteSize(int64(physInfo.TotalPages) * 4096))
+	fmt.Printf("free memory %s\n", xen.ByteSize(int64(physInfo.FreePages) * 4096))
 	fmt.Printf("threads per core %d\n", physInfo.ThreadsPerCore)
 	fmt.Printf("cores per socket %d\n", physInfo.CoresPerSocket)
 	fmt.Printf("nr cpus %d\n", physInfo.NrCpus)
