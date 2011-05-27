@@ -49,7 +49,9 @@ func (this *xen_handle) PhysInfo() PhysInfo {
 	var info C.xc_physinfo_t 
 	C.xc_physinfo(this.xc, &info)
 
-	return PhysInfo{int32(info.total_pages)}
+	pinfo := PhysInfo{int32(info.total_pages), int32(info.free_pages), int32(info.scrub_pages), int(info.threads_per_core), int(info.cores_per_socket), 0}
+	fillPhysInfo(&pinfo, &info)
+	return pinfo
 }
 
 func (this *xen_handle) Read(path string) string {
