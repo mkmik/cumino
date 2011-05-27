@@ -4,6 +4,6 @@ TARG=$(XENVERSION)/vimini/xen
 GOFILES=domain.go
 CGOFILES=xen.go xen_$(XENVERSION).go
 CGO_CFLAGS=-I../../deps/xen/$(XENVERSION)/include
-CGO_LDFLAGS=-L../../deps/xen/$(XENVERSION)/lib -lxenctrl -lxenstore
+CGO_LDFLAGS=-L../../deps/xen/$(XENVERSION)/lib -lxenctrl -lxenstore -lxenguest
 
 include $(GOROOT)/src/Make.pkg
