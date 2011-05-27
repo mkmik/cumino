@@ -10,9 +10,13 @@ func main() {
 
 	handle := xen.Init()
 
+	physInfo := handle.PhysInfo()
+
+	fmt.Printf("total memory %d\n", int64(physInfo.TotalPages) * 4096)
+
 	domains := handle.List()
 	for _, d := range(domains) {
-		fmt.Printf("domain: %d (%s)\n", d.DomId, d.Name)
+		fmt.Printf("domain: %d (%s) %d Mb\n", d.DomId, d.Name, d.Memory / 1024)
 	}
 
 	name := handle.Name(0)

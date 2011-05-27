@@ -12,6 +12,7 @@ import "C"
 import (
 	"fmt"
 	"unsafe"
+	"strconv"
 )
 
 type xen_handle struct {
@@ -35,11 +36,20 @@ func (this *xen_handle) List() []Domain {
 	domains := make([]Domain, res)
 	slice := info[0:res]
 	for idx, di := range(slice) {
-		domains[idx].DomId = int(di.domid)
-		domains[idx].Name = this.Name(int(di.domid))
+		domid := int(di.domid)
+		domains[idx].DomId = domid
+		domains[idx].Name = this.Name(domid)
+		domains[idx].Memory = this.Memory(domid)
 	}
 	
 	return domains
+}
+
+func (this *xen_handle) PhysInfo() PhysInfo {
+	var info C.xc_physinfo_t 
+	C.xc_physinfo(this.xc, &info)
+
+	return PhysInfo{int32(info.total_pages)}
 }
 
 func (this *xen_handle) Read(path string) string {
@@ -56,4 +66,10 @@ func (this *xen_handle) Read(path string) string {
 func (this *xen_handle) Name(id int) string {
 	path := fmt.Sprintf("/local/domain/%d/name", id)
 	return this.Read(path)
+}
+
+func (this *xen_handle) Memory(id int) int {
+	path := fmt.Sprintf("/local/domain/%d/memory/target", id)
+	memory, _ := strconv.Atoi(this.Read(path))
+	return memory
 }
