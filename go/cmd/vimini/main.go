@@ -2,6 +2,7 @@ package main
 
 import (
 	"vimini/xen"
+	"vimini/lvm"
 	"fmt"
 )
 
@@ -9,6 +10,7 @@ func main() {
 	fmt.Println("vimini started")
 
 	handle := xen.Init()
+	lvm := lvm.Init()
 
 	physInfo := handle.PhysInfo()
 
@@ -23,6 +25,7 @@ func main() {
 		fmt.Printf("domain: %d (%s) %d Mb\n", d.DomId, d.Name, d.Memory / 1024)
 	}
 
-	name := handle.Name(0)
-	fmt.Printf("name: %s\n", name)
+	vgname := "dlib21x"
+	vg := lvm.Open(vgname, "r")
+	fmt.Printf("VG %p\n", vg)
 }
