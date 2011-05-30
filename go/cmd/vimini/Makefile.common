@@ -2,8 +2,8 @@ include $(GOROOT)/src/Make.inc
 
 TARG=vimini-$(XENVERSION)
 GOFILES=main.go
-GCIMPORTS=-I../../pkg/xen/_obj/$(XENVERSION)
-LDIMPORTS=-L../../pkg/xen/_obj/$(XENVERSION)
+GCIMPORTS=-I../../pkg/xen/_obj/$(XENVERSION) -I../../pkg/lvm/_obj
+LDIMPORTS=-L../../pkg/xen/_obj/$(XENVERSION) -L../../pkg/lvm/_obj
 CGO_LDFLAGS=-L../../deps/xen/$(XENVERSION)/lib -lxenctrl -lxenstore
 
 include $(GOROOT)/src/Make.cmd

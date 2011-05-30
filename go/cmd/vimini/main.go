@@ -2,6 +2,7 @@ package main
 
 import (
 	"vimini/xen"
+	"vimini/lvm"
 	"fmt"
 )
 
@@ -23,6 +24,4 @@ func main() {
 		fmt.Printf("domain: %d (%s) %d Mb\n", d.DomId, d.Name, d.Memory / 1024)
 	}
 
-	name := handle.Name(0)
-	fmt.Printf("name: %s\n", name)
 }

@@ -21,7 +21,7 @@ type xen_handle struct {
 }
 
 func Init() *xen_handle {
-	fmt.Println("vimini ok")
+	fmt.Println("initializing xen")
 
 	return &xen_handle{xc: C.xc_interface_open(), xs: C.xs_daemon_open_readonly()}
 }
