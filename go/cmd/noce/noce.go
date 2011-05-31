@@ -65,13 +65,13 @@ func splitChecksum(checksum string) string {
 }
 
 func download(c *clnt.Clnt) os.Error {
-	temp, err := ioutil.TempFile(".", ".")
+	temp, err := ioutil.TempFile(".", ".download-")
 	if err != nil {
 		return os.NewError(fmt.Sprintf("cannot create temp file: %s\n", err))
 	}
 	defer temp.Close()
 	toDelete <- temp.Name()
-	defer os.Remove(temp.Name())
+	defer func() {deleteNow <- temp.Name()}()
 	temp.Chmod(0766)
 	
 
