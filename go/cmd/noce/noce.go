@@ -14,6 +14,7 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"time"
+	"os/signal"
 )
 
 var addr = flag.String("addr", "127.0.0.1:5645", "network address")
@@ -69,6 +70,7 @@ func download(c *clnt.Clnt) os.Error {
 		return os.NewError(fmt.Sprintf("cannot create temp file: %s\n", err))
 	}
 	defer temp.Close()
+	toDelete <- temp.Name()
 	defer os.Remove(temp.Name())
 	temp.Chmod(0766)
 	
@@ -96,43 +98,80 @@ func download(c *clnt.Clnt) os.Error {
 	return nil
 }
 
+func mountWait() *clnt.Clnt {
+  user := p.OsUsers.Uid2User(os.Geteuid())
+
+	for {
+		c, perr := clnt.Mount("tcp", *addr, "", user)
+		if perr != nil {
+			log.Printf("cannot mount: %s\n", perr)
+			time.Sleep(500e6)
+		} else {
+			return c
+		}
+	}
+	// should never get here
+	return nil
+}
+
+func downloader() {
+	for {
+		c := mountWait()
+		for {
+			err := download(c)
+			if err != nil {
+				fmt.Printf("cannot download: %s\n", err)
+				break
+			}
+		}
+	}
+}
+
+
+var toDelete = make(chan string, 10)
+var deleteNow = make(chan string, 10)
+
+func handleSignals() {
+	toBeDeleted := make(map[string] int)
+	for {
+		select {
+		case reg := <- toDelete:
+			toBeDeleted[reg] = 1
+
+		case file := <- deleteNow:
+			toBeDeleted[file] = 0, false
+			os.Remove(file)
+
+		case sig := <- signal.Incoming:
+			fmt.Printf("got signal %v\n", sig)
+			
+			for el, _ := range(toBeDeleted) {
+				fmt.Printf("Deleting temporary %s\n", el)
+        os.Remove(el)
+			}
+
+			ux, ok := sig.(signal.UnixSignal)
+			if ok {
+				os.Exit(int(ux))
+			} else {
+				os.Exit(1)
+			}
+		}
+	}
+}
+
+
 func main() {
-//	fmt.Printf("node checker\n")
+	fmt.Printf("node checker\n")
 
 	flag.Parse()
 
-  user := p.OsUsers.Uid2User(os.Geteuid())
   clnt.DefaultDebuglevel = *debuglevel
 
-  c, perr := clnt.Mount("tcp", *addr, "", user)
-  if perr != nil {
-    log.Panicf("cannot mount: %s\n", perr)
-  }
+	go handleSignals()
 
-	for {
-		err := download(c)
-		if err != nil {
-			fmt.Printf("cannot download: %s\n", err)
-
-			fmt.Printf("retrying\n")
-			for {
-				time.Sleep(500e6)
-				
-				c, perr = clnt.Mount("tcp", *addr, "", user)
-				if perr != nil {
-					log.Printf("cannot mount: %s\n", perr)
-				} else {
-					break
-				}
-			}
-			
-		}
-	}
-
-
+	downloader()
 	
-	
-	//	ioutil.WriteFile("software/vimini.md5", []byte(hex.EncodeToString(sum)), 0666)
 
 }
 
