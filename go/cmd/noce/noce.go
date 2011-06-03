@@ -11,7 +11,6 @@ import (
 	"strings"
 	"io/ioutil"
 	"bytes"
-	"crypto/md5"
 	"encoding/hex"
 	"time"
 	"os/signal"
@@ -32,7 +31,7 @@ func readRemoteFile(c *clnt.Clnt, name string, dest io.Writer) ([]byte, os.Error
   }
 	defer file.Close()
 
-	hash := md5.New()
+	hash := sha256.New()
 	buf := make([]byte, 8192)
   for {
    	n, err := file.Read(buf)
@@ -87,12 +86,14 @@ func download(c *clnt.Clnt) os.Error {
 	temp.Close()
 	
 
-	checksum, err := readAllRemoteFile(c, "/vimini.md5")
+	sig, err := readAllRemoteFile(c, "/vimini.sha256")
 	if err != nil {
 		return os.NewError(fmt.Sprintf("cannot read remote file md5: %s\n", err))
 	}
+
+	valid := verify(sum, sig)
 	
-	if hex.EncodeToString(sum) != splitChecksum(string(checksum)) {
+	if !valid {
 		fmt.Printf("wrong checksum: %s\n", hex.EncodeToString(sum))
 	} else {
 		os.Rename(temp.Name(), "software/vimini")
@@ -143,6 +144,7 @@ func handleSignals() {
 			toBeDeleted[reg] = 1
 
 		case file := <- deleteNow:
+			fmt.Printf("deleting now %s\n", file)
 			toBeDeleted[file] = 0, false
 			os.Remove(file)
 
@@ -165,6 +167,24 @@ func handleSignals() {
 }
 
 
+func verify(hash []byte, sig []byte) bool {
+	cert, err := ioutil.ReadFile("/home/marko/Projects/efg-auth/certs/cert.crt")
+	if err != nil {
+		log.Panicf("load certificate %s\n", err)
+	}
+	
+	pcert, err := x509.ParseCertificate(cert)
+	
+	if err != nil {
+		log.Panicf("parse cert %s\n", err)
+	}
+	
+	pub := pcert.PublicKey.(*rsa.PublicKey)
+	
+	err = rsa.VerifyPKCS1v15(pub, crypto.SHA256, hash, sig)
+	return err == nil
+}
+
 func main() {
 	fmt.Printf("node checker\n")
 
@@ -174,37 +194,8 @@ func main() {
  
 	go handleSignals()
 
-//	downloader()
+	downloader()
 	
-	cert, err := ioutil.ReadFile("/home/marko/Projects/efg-auth/certs/cert.crt")
-	if err != nil {
-		log.Panicf("load certificate %s\n", err)
-	}
-	
-	pcert, err := x509.ParseCertificate(cert)
-
-	if err != nil {
-		log.Panicf("parse cert %s\n", err)
-	}
-	
-	pub := pcert.PublicKey.(*rsa.PublicKey)
-	fmt.Printf("key %v\n", pub)
-
-	sig, err := ioutil.ReadFile("/tmp/test.sha256")
-	if err != nil {
-		log.Panicf("load sig %s\n", err)
-	}
-
-	algo := sha256.New()
-	algo.Write([]byte("ciao"))
-	fhash := algo.Sum()
-
-	err = rsa.VerifyPKCS1v15(pub, crypto.SHA256, fhash, sig)
-	if err != nil {
-		fmt.Printf("failed verify %s\n", err)
-	} else {
-		fmt.Printf("verify ok\n")
-	}
 
 }
 
