@@ -15,6 +15,10 @@ import (
 	"encoding/hex"
 	"time"
 	"os/signal"
+	"crypto"
+	"crypto/x509"
+	"crypto/rsa"
+	"crypto/sha256"
 )
 
 var addr = flag.String("addr", "127.0.0.1:5645", "network address")
@@ -167,11 +171,40 @@ func main() {
 	flag.Parse()
 
   clnt.DefaultDebuglevel = *debuglevel
-
+ 
 	go handleSignals()
 
-	downloader()
+//	downloader()
 	
+	cert, err := ioutil.ReadFile("/home/marko/Projects/efg-auth/certs/cert.crt")
+	if err != nil {
+		log.Panicf("load certificate %s\n", err)
+	}
+	
+	pcert, err := x509.ParseCertificate(cert)
+
+	if err != nil {
+		log.Panicf("parse cert %s\n", err)
+	}
+	
+	pub := pcert.PublicKey.(*rsa.PublicKey)
+	fmt.Printf("key %v\n", pub)
+
+	sig, err := ioutil.ReadFile("/tmp/test.sha256")
+	if err != nil {
+		log.Panicf("load sig %s\n", err)
+	}
+
+	algo := sha256.New()
+	algo.Write([]byte("ciao"))
+	fhash := algo.Sum()
+
+	err = rsa.VerifyPKCS1v15(pub, crypto.SHA256, fhash, sig)
+	if err != nil {
+		fmt.Printf("failed verify %s\n", err)
+	} else {
+		fmt.Printf("verify ok\n")
+	}
 
 }
 
