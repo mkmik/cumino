@@ -26,25 +26,24 @@ var debuglevel = flag.Int("d", 0, "debuglevel")
 
 func readRemoteFile(c *clnt.Clnt, name string, dest io.Writer) os.Error {
 	file, err := c.FOpen(name, p.OREAD)
-  if err != nil {
+	if err != nil {
 		return os.NewError(err.String())
-  }
+	}
 	defer file.Close()
 
 	buf := make([]byte, 8192)
-  for {
-   	n, err := file.Read(buf)
-    if err != nil {
+	for {
+		n, err := file.Read(buf)
+		if err != nil {
 			return os.NewError(err.String())
-    }
-    
-    if n == 0 {
-    	break
-    }
-  
-		dest.Write(buf[0:n])
-  }
+		}
 
+		if n == 0 {
+			break
+		}
+
+		dest.Write(buf[0:n])
+	}
 
 	return nil
 }
@@ -72,7 +71,7 @@ func download(c *clnt.Clnt) os.Error {
 	}
 	defer temp.Close()
 	toDelete <- temp.Name()
-	defer func() {deleteNow <- temp.Name()}()
+	defer func() { deleteNow <- temp.Name() }()
 	temp.Chmod(0766)
 
 	hash := sha256.New()
@@ -84,7 +83,6 @@ func download(c *clnt.Clnt) os.Error {
 		return os.NewError(fmt.Sprintf("cannot read remote file: %s\n", err))
 	}
 	temp.Close()
-	
 
 	sig, err := readAllRemoteFile(c, "/vimini.sha256")
 	if err != nil {
@@ -93,7 +91,7 @@ func download(c *clnt.Clnt) os.Error {
 
 	sum := hash.Sum()
 	valid := verify(sum, sig)
-	
+
 	if !valid {
 		fmt.Printf("wrong checksum: %s\n", hex.EncodeToString(sum))
 	} else {
@@ -105,7 +103,7 @@ func download(c *clnt.Clnt) os.Error {
 }
 
 func mountWait() *clnt.Clnt {
-  user := p.OsUsers.Uid2User(os.Geteuid())
+	user := p.OsUsers.Uid2User(os.Geteuid())
 
 	for {
 		c, perr := clnt.Mount("tcp", *addr, "", user)
@@ -138,23 +136,23 @@ var toDelete = make(chan string, 10)
 var deleteNow = make(chan string, 10)
 
 func handleSignals() {
-	toBeDeleted := make(map[string] int)
+	toBeDeleted := make(map[string]int)
 	for {
 		select {
-		case reg := <- toDelete:
+		case reg := <-toDelete:
 			toBeDeleted[reg] = 1
 
-		case file := <- deleteNow:
+		case file := <-deleteNow:
 			fmt.Printf("deleting now %s\n", file)
 			toBeDeleted[file] = 0, false
 			os.Remove(file)
 
-		case sig := <- signal.Incoming:
+		case sig := <-signal.Incoming:
 			fmt.Printf("got signal %v\n", sig)
-			
-			for el, _ := range(toBeDeleted) {
+
+			for el, _ := range toBeDeleted {
 				fmt.Printf("Deleting temporary %s\n", el)
-        os.Remove(el)
+				os.Remove(el)
 			}
 
 			ux, ok := sig.(signal.UnixSignal)
@@ -173,15 +171,15 @@ func verify(hash []byte, sig []byte) bool {
 	if err != nil {
 		log.Panicf("load certificate %s\n", err)
 	}
-	
+
 	pcert, err := x509.ParseCertificate(cert)
-	
+
 	if err != nil {
 		log.Panicf("parse cert %s\n", err)
 	}
-	
+
 	pub := pcert.PublicKey.(*rsa.PublicKey)
-	
+
 	err = rsa.VerifyPKCS1v15(pub, crypto.SHA256, hash, sig)
 	return err == nil
 }
@@ -191,12 +189,10 @@ func main() {
 
 	flag.Parse()
 
-  clnt.DefaultDebuglevel = *debuglevel
- 
+	clnt.DefaultDebuglevel = *debuglevel
+
 	go handleSignals()
 
 	downloader()
-	
 
 }
-
