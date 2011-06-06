@@ -31,19 +31,7 @@ func readRemoteFile(c *clnt.Clnt, name string, dest io.Writer) os.Error {
 	}
 	defer file.Close()
 
-	buf := make([]byte, 8192)
-	for {
-		n, err := file.Read(buf)
-		if err != nil {
-			return os.NewError(err.String())
-		}
-
-		if n == 0 {
-			break
-		}
-
-		dest.Write(buf[0:n])
-	}
+	io.Copy(dest, file)
 
 	return nil
 }
@@ -86,14 +74,15 @@ func download(c *clnt.Clnt) os.Error {
 
 	sig, err := readAllRemoteFile(c, "/vimini.sha256")
 	if err != nil {
-		return os.NewError(fmt.Sprintf("cannot read remote file md5: %s\n", err))
+		return os.NewError(fmt.Sprintf("cannot read remote file signature: %s\n", err))
 	}
 
 	sum := hash.Sum()
 	valid := verify(sum, sig)
 
 	if !valid {
-		fmt.Printf("wrong checksum: %s\n", hex.EncodeToString(sum))
+		fmt.Printf("wrong checksum: %s vs %s\n", hex.EncodeToString(sum), hex.EncodeToString(sig))
+		time.Sleep(10e9)
 	} else {
 		os.Rename(temp.Name(), "software/vimini")
 		fmt.Printf("file downloaded\n")
