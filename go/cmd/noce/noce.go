@@ -24,19 +24,18 @@ var addr = flag.String("addr", "127.0.0.1:5645", "network address")
 var debuglevel = flag.Int("d", 0, "debuglevel")
 
 
-func readRemoteFile(c *clnt.Clnt, name string, dest io.Writer) ([]byte, os.Error) {
+func readRemoteFile(c *clnt.Clnt, name string, dest io.Writer) os.Error {
 	file, err := c.FOpen(name, p.OREAD)
   if err != nil {
-		return nil, os.NewError(err.String())
+		return os.NewError(err.String())
   }
 	defer file.Close()
 
-	hash := sha256.New()
 	buf := make([]byte, 8192)
   for {
    	n, err := file.Read(buf)
     if err != nil {
-			return nil, os.NewError(err.String())
+			return os.NewError(err.String())
     }
     
     if n == 0 {
@@ -44,17 +43,16 @@ func readRemoteFile(c *clnt.Clnt, name string, dest io.Writer) ([]byte, os.Error
     }
   
 		dest.Write(buf[0:n])
-		hash.Write(buf[0:n])
   }
 
 
-	return hash.Sum(), nil
+	return nil
 }
 
 func readAllRemoteFile(c *clnt.Clnt, name string) ([]byte, os.Error) {
 	data := bytes.NewBuffer(make([]byte, 0, 8192))
 
-	_, err := readRemoteFile(c, name, data)
+	err := readRemoteFile(c, name, data)
 	if err != nil {
 		return nil, err
 	}
@@ -76,10 +74,12 @@ func download(c *clnt.Clnt) os.Error {
 	toDelete <- temp.Name()
 	defer func() {deleteNow <- temp.Name()}()
 	temp.Chmod(0766)
-	
+
+	hash := sha256.New()
+	dest := io.MultiWriter(temp, hash)
 
 	fmt.Printf("downloading file\n")
-	sum, err := readRemoteFile(c, "/vimini", temp)
+	err = readRemoteFile(c, "/vimini", dest)
 	if err != nil {
 		return os.NewError(fmt.Sprintf("cannot read remote file: %s\n", err))
 	}
@@ -91,6 +91,7 @@ func download(c *clnt.Clnt) os.Error {
 		return os.NewError(fmt.Sprintf("cannot read remote file md5: %s\n", err))
 	}
 
+	sum := hash.Sum()
 	valid := verify(sum, sig)
 	
 	if !valid {
