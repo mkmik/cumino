@@ -173,15 +173,82 @@ func verify(hash []byte, sig []byte) bool {
 	return err == nil
 }
 
-func main() {
-	fmt.Printf("node checker\n")
+func skip(name string) bool {
+	return strings.HasSuffix(name, ".sha256") || strings.HasPrefix(name, ".")
+}
 
+func walk(events chan *p.Dir, c *clnt.Clnt, path string) {
+	file, oerr := c.FOpen(path, p.OREAD)
+	defer file.Close()
+
+	if oerr != nil {
+		log.Panicf("cannot open dir %s", oerr)
+	}
+
+	for {
+		d, oerr := file.Readdir(0)
+		if oerr != nil {
+			log.Panicf("cannot read dir %s", oerr)
+		}
+		
+		if d == nil || len(d) == 0 {
+			break
+		}
+		
+		for _, e := range d {
+			if !skip(e.Name) {
+				events <- e
+
+				if e.Mode & p.DMDIR != 0 {
+					walk(events, c, path + "/" + e.Name)
+				}
+			}
+		}
+	}
+	
+}
+
+func lister(events chan *p.Dir) {
+	for {
+		c := mountWait()
+		walk(events, c, "/")
+		time.Sleep(1e9)
+
+		err := waitNotifications(c, events)
+		if err != nil {
+			log.Panicf("cannot wait for notifications")
+		}
+	}
+}
+
+func waitNotifications(c *clnt.Clnt, events chan *p.Dir) os.Error {
+	file, err := c.FOpen("/.control", p.OREAD)
+	if err != nil {
+		return os.NewError(err.String())
+	}
+	defer file.Close()
+	
+	return nil
+}
+
+func reactor(events chan *p.Dir) {
+	for e := range events {
+		fmt.Printf("got: '%s' %t\n", e.Name, e.Mode & p.DMDIR != 0)
+	}
+}
+
+func main() {
 	flag.Parse()
 
 	clnt.DefaultDebuglevel = *debuglevel
 
 	go handleSignals()
 
-	downloader()
+	events := make(chan *p.Dir, 10)
 
+//	downloader()
+	go lister(events)
+	reactor(events)
+
+	
 }

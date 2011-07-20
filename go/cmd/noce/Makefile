@@ -4,3 +4,6 @@ TARG=noce
 GOFILES=noce.go
 
 include $(GOROOT)/src/Make.cmd
+
+test: all
+	./$(TARG)	
