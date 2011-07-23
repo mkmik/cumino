@@ -15,18 +15,6 @@ viewModel = {
   modes: ["Physical machines", "Virtual machines", "Storage Machines", "Storage volumes"]
 
   selectedMode: ko.observable("Physical machines")
-
-  selectMode: (mode) ->
-    console.log("deprecated")
-    this.selectedMode(mode)
-
-    #if(mode == "Physical machines")
-    #  this.cards(this.phys)
-    #  # updateCards(this.phys)
-    #else if(mode == "Virtual machines")
-    #  this.cards(this.vms)
-    #  #updateCards(this.vms)
-
 }
 
 viewModel.cards = ko.observableArray(viewModel.phys)
@@ -39,15 +27,8 @@ viewModel.currentCards = ko.dependentObservable ( ->
 
 window.viewModel = viewModel
 
-ko.applyBindings viewModel
-
-updateCards = (cards) ->
-  $("#cards").isotope("destroy")
-  viewModel.cards(cards)
-  isotopize()
-
-isotopize = ->
-  $('#cards').isotope {
+isotopize = (el) ->
+  el.isotope {
     itemSelector : '.card'
     layoutMode : 'fitRows'
     #  filter: ".card-kind-phy"
@@ -57,7 +38,25 @@ isotopize = ->
     }
   }
 
-isotopize()
+
+ko.bindingHandlers.isotope = {
+    init: (element, valueAccessor, allBindingsAccessor, viewModel) ->
+     # I would like to initialize isotope here, but it doesn't work
+    update: (element, valueAccessor, allBindingsAccessor, viewModel) ->
+      dummy = valueAccessor()() # trigger dependency
+      if($(element).hasClass("isotope"))
+        $(element).isotope "destroy"
+        isotopize($(element))
+}
+
+
+ko.applyBindings viewModel
+
+ko.linkObservableToUrl(viewModel.selectedMode, "mode", "Physical machines")
+
+
+isotopize($("#cards"))
+window.isotopize = isotopize
 
 $("#sortByOriginal").click -> $("#cards").isotope {sortBy: "original-order"}
 $("#sortByGroup").click -> $("#cards").isotope {sortBy: "group"}

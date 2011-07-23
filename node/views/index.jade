@@ -3,7 +3,7 @@
     button#sortByOriginal sort by original
     button#sortByGroup sort by group
     button#sortBySize sort by size
-    #cards(data-bind="template: {name: 'cardsTemplate', foreach: currentCards}")
+    #cards(data-bind="isotope: currentCards, template: {name: 'cardsTemplate', foreach: currentCards}")
 
 #column2.stack1of4
   .stackContent
