@@ -2,3 +2,4 @@
 node_modules
 public/stylesheets/reset.css
 public/stylesheets/style.css
+public/javascripts/main.js

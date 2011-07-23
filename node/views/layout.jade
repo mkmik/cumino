@@ -1,39 +1,51 @@
-!!!
+!!! 5
 html
   head
     title= title
+    link(rel='stylesheet', href='stylesheets/stacklayout-min.css')
+    link(rel='stylesheet', href='stylesheets/style.css')
     script(type="text/javascript", src="/javascripts/modernizr-latest.js")
     script(type="text/javascript")
-     Modernizr.load(["/stylesheets/stacklayout-min.css",
-                     "/stylesheets/style.css", {
-       load: 'http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js',
-       complete: function () {
-         if (!window.jQuery) {
-           Modernizr.load('/javascripts/jquery-1.6.2.min.js');
-         }
-       }
-       },
+
+     var cdnJQuery = {
+                        load: 'http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js',
+                        complete: function () {
+                          if (!window.jQuery) {
+                            Modernizr.load('/javascripts/jquery-1.6.2.min.js');
+                          }
+                       }
+                     };
+     var cdnJQueryTemplate = {
+                        load: 'http://ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js',
+                        complete: function () {
+                          if (!window.jQuery.template) {
+                            Modernizr.load('/javascripts/jquery.tmpl.min.js');
+                          }
+                       }
+                     };
+     // force local                
+     cdnJQuery = '/javascripts/jquery-1.6.2.min.js'
+     cdnJQueryTemplate = '/javascripts/jquery.tmpl.min.js'
+     Modernizr.load([cdnJQuery, cdnJQueryTemplate,
+                    "/stylesheets/isotope.css",
+                    "/javascripts/knockout-1.2.1.js", "/javascripts/jquery.isotope.min.js", "/javascripts/main.js"
        ]);
+
   body
     #page
       .stack
         #header
           .stackAuto
-            ul.stackContent
-              li 
-                a +Marko
-              li 
-                a Gmail
-              li 
-                a Calendar
-              li 
-                a Documents
+            script(type="x-jquery-tmpl", id="mainNavTemplate")
+              <li data-bind="css: { active: $data == viewModel.selectedMode() }, click: function() { viewModel.selectMode($data) }"><span class="marker"></span><a>${$data}</a></li>
+
+            ul#mainNav.stackContent(data-bind="template: { name: 'mainNavTemplate', foreach: modes }")
           #rightNav.stackAuto
             ul.stackContent
               li
-                a Marko Mikulicic
+                a marko.mikulicic
               li
-                a blablas
+                a(data-bind="text: test") blablas
 
 
         #content!= body
