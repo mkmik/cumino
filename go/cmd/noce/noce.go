@@ -144,7 +144,7 @@ func handleSignals() {
 				os.Remove(el)
 			}
 
-			ux, ok := sig.(signal.UnixSignal)
+			ux, ok := sig.(os.UnixSignal)
 			if ok {
 				os.Exit(int(ux))
 			} else {
@@ -190,22 +190,22 @@ func walk(events chan *p.Dir, c *clnt.Clnt, path string) {
 		if oerr != nil {
 			log.Panicf("cannot read dir %s", oerr)
 		}
-		
+
 		if d == nil || len(d) == 0 {
 			break
 		}
-		
+
 		for _, e := range d {
 			if !skip(e.Name) {
 				events <- e
 
-				if e.Mode & p.DMDIR != 0 {
-					walk(events, c, path + "/" + e.Name)
+				if e.Mode&p.DMDIR != 0 {
+					walk(events, c, path+"/"+e.Name)
 				}
 			}
 		}
 	}
-	
+
 }
 
 func lister(events chan *p.Dir) {
@@ -227,13 +227,13 @@ func waitNotifications(c *clnt.Clnt, events chan *p.Dir) os.Error {
 		return os.NewError(err.String())
 	}
 	defer file.Close()
-	
+
 	return nil
 }
 
 func reactor(events chan *p.Dir) {
 	for e := range events {
-		fmt.Printf("got: '%s' %t\n", e.Name, e.Mode & p.DMDIR != 0)
+		fmt.Printf("got: '%s' %t\n", e.Name, e.Mode&p.DMDIR != 0)
 	}
 }
 
@@ -246,9 +246,8 @@ func main() {
 
 	events := make(chan *p.Dir, 10)
 
-//	downloader()
+	//	downloader()
 	go lister(events)
 	reactor(events)
 
-	
 }
