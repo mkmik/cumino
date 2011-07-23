@@ -1,5 +1,6 @@
 #column1.stack3of4
   .stackContent
+    button#sortByOriginal sort by original
     button#sortByGroup sort by group
     button#sortBySize sort by size
     #cards(data-bind="template: 'cardsTemplate'")
@@ -12,5 +13,5 @@
 
 script(type="text/x-jquery-tmpl", id="cardsTemplate")
   | {{each cards}}
-  |   <div class="card card-group-${group} card-size-${size}" data-group="${group}" data-size="${size}">${name}</div>
+  |   <div class="card card-group-${group} card-size-${size} card-kind-${kind}" data-group="${group}" data-size="${size}">${name}</div>
   | {{/each}}
