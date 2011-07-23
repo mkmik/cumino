@@ -17,29 +17,35 @@ viewModel = {
   selectMode: (mode) ->
     this.selectedMode(mode)
     if(mode == "Physical machines")
-      $("#cards").isotope({filter: ".card-kind-phy"})
+      updateCards(this.phys)
     else if(mode == "Virtual machines")
-      $("#cards").isotope({filter: ".card-kind-vm"})
+      updateCards(this.vms)
 
 }
 
-viewModel.cards = ko.observableArray([].concat viewModel.vms, viewModel.phys)
+viewModel.cards = ko.observableArray(viewModel.phys)
 
 window.viewModel = viewModel
 
 ko.applyBindings viewModel
 
+updateCards = (cards) ->
+  $("#cards").isotope("destroy")
+  viewModel.cards(cards)
+  isotopize()
 
-
-$('#cards').isotope {
-  itemSelector : '.card'
-  layoutMode : 'fitRows'
-  #  filter: ".card-kind-phy"
-  getSortData: {
-    group: (elem) -> elem.attr("data-group")
-    size: (elem) -> elem.attr("data-size")
+isotopize = ->
+  $('#cards').isotope {
+    itemSelector : '.card'
+    layoutMode : 'fitRows'
+    #  filter: ".card-kind-phy"
+    getSortData: {
+      group: (elem) -> elem.attr("data-group")
+      size: (elem) -> elem.attr("data-size")
+    }
   }
-}
+
+isotopize()
 
 $("#sortByOriginal").click -> $("#cards").isotope {sortBy: "original-order"}
 $("#sortByGroup").click -> $("#cards").isotope {sortBy: "group"}
