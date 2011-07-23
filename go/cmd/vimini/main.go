@@ -5,25 +5,18 @@ import (
 	"fmt"
 	"exec"
 	"log"
-	"io/ioutil"
 )
 
 func main() {
 	fmt.Println("vimini started")
 
-	cmd, err := exec.Run("/usr/sbin/xm", []string{"/usr/sbin/xm", "list"}, []string{}, "/", exec.Pipe, exec.Pipe, exec.DevNull)
-	if err != nil {
-		log.Panicf("something happened %s\n", err)
-	}
-	fmt.Printf("cmd %p\n", cmd);
-
-	data, err := ioutil.ReadAll(cmd.Stdout)
+	cmd := exec.Command("/usr/sbin/xm", "list")
+	data, err := cmd.CombinedOutput()
 	if err != nil {
 		log.Panicf("something happened %s\n", err)
 	}
 
-	fmt.Printf("output '%s'\n", string(data));
-	
+	fmt.Printf("output '%s'\n", string(data));	
 }
 
 func list() {
