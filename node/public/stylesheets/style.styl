@@ -9,19 +9,59 @@ border-radius()
 box-shadow()
   vendor('box-shadow', arguments)
 
-// 
+//  resets
 
-body {
- padding: 50px;
- font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
-}
+@import "reset"
+reset()
 
-a {
- color: #00B7FF;
-}
+ul
+  list-style none
 
-.test {
-  border: 1px solid black;
-  border-radius: 12px;
-}
+ol
+  list-style none
 
+
+// colors
+
+bar = #2d2d2d
+barHeight = 30px
+
+// global stuff
+
+.stackContent,
+#nav li,
+body,
+input,
+select,
+textarea
+  font: 13px Arial,sans-serif 
+
+
+// stuff
+
+.test
+  border 1px solid black
+  border-radius 6px
+  padding 4px
+  box-shadow 5px 5px 5px #888;
+
+#header
+  background-color bar
+  color #ccc
+  height barHeight
+  padding 0 3px
+  text-align left
+
+  li
+    float: left
+    display list-item
+
+    a
+      display: block
+      float: left
+      padding-top 7px
+      padding-right 6px
+      padding-left 6px
+
+#rightNav
+  float right

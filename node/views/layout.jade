@@ -2,5 +2,31 @@
 html
   head
     title= title
+    link(rel='stylesheet', href='/stylesheets/stacklayout-min.css')
     link(rel='stylesheet', href='/stylesheets/style.css')
-  body!= body
+  body
+    #page
+      .stack
+        #header
+          .stackAuto
+            ul.stackContent
+              li 
+                a +Marko
+              li 
+                a Gmail
+              li 
+                a Calendar
+              li 
+                a Documents
+          #rightNav.stackAuto
+            ul.stackContent
+              li
+                a Marko Mikulicic
+              li
+                a blablas
+
+
+        #content!= body
+        #footer
+          .stackContent
+            p blabla
