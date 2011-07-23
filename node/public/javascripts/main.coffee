@@ -13,17 +13,29 @@ viewModel = {
 
 
   modes: ["Physical machines", "Virtual machines", "Storage Machines", "Storage volumes"]
+
   selectedMode: ko.observable("Physical machines")
+
   selectMode: (mode) ->
+    console.log("deprecated")
     this.selectedMode(mode)
-    if(mode == "Physical machines")
-      updateCards(this.phys)
-    else if(mode == "Virtual machines")
-      updateCards(this.vms)
+
+    #if(mode == "Physical machines")
+    #  this.cards(this.phys)
+    #  # updateCards(this.phys)
+    #else if(mode == "Virtual machines")
+    #  this.cards(this.vms)
+    #  #updateCards(this.vms)
 
 }
 
 viewModel.cards = ko.observableArray(viewModel.phys)
+viewModel.currentCards = ko.dependentObservable ( ->
+  if(this.selectedMode() == "Physical machines")
+    res = this.phys
+  else if(this.selectedMode() == "Virtual machines")
+    res = this.vms
+  ), viewModel
 
 window.viewModel = viewModel
 
