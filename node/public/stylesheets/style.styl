@@ -1,0 +1,27 @@
+vendor(prop, args)
+  -webkit-{prop} args
+  -moz-{prop} args
+  {prop} args
+
+border-radius()
+  vendor('border-radius', arguments)
+
+box-shadow()
+  vendor('box-shadow', arguments)
+
+// 
+
+body {
+ padding: 50px;
+ font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+ color: #00B7FF;
+}
+
+.test {
+  border: 1px solid black;
+  border-radius: 12px;
+}
+
