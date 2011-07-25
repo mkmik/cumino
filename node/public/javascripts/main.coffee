@@ -12,16 +12,16 @@ viewModel = {
   vms: new Card("v " + name, "vm") for name in ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14"]
 
 
-  modes: ["Physical machines", "Virtual machines", "Storage Machines", "Storage volumes"]
+  modes: [{name: "phys", label:"Physical machines"}, {name: "vms", label: "Virtual machines"}, {name: "stms", label: "Storage Machines"}, {name: "vols", label: "Storage volumes"}]
 
-  selectedMode: ko.observable("Physical machines")
+  selectedMode: ko.observable("phys")
 }
 
 viewModel.cards = ko.observableArray(viewModel.phys)
 viewModel.currentCards = ko.dependentObservable ( ->
-  if(this.selectedMode() == "Physical machines")
+  if(this.selectedMode() == "phys")
     res = this.phys
-  else if(this.selectedMode() == "Virtual machines")
+  else if(this.selectedMode() == "vms")
     res = this.vms
   ), viewModel
 
@@ -52,7 +52,7 @@ ko.bindingHandlers.isotope = {
 
 ko.applyBindings viewModel
 
-ko.linkObservableToUrl(viewModel.selectedMode, "mode", "Physical machines")
+ko.linkObservableToUrl(viewModel.selectedMode, "mode", "phys")
 
 
 isotopize($("#cards"))

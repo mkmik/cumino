@@ -39,7 +39,7 @@ html
         #header
           .stackAuto
             script(type="x-jquery-tmpl", id="mainNavTemplate")
-              <li data-bind="css: { active: $data == viewModel.selectedMode() }, click: function() { viewModel.selectedMode($data) }"><span class="marker"></span><a>${$data}</a></li>
+              <li data-bind="css: { active: name == viewModel.selectedMode() }, click: function() { viewModel.selectedMode(name) }"><span class="marker"></span><a>${label}</a></li>
 
             ul#mainNav.stackContent(data-bind="template: { name: 'mainNavTemplate', foreach: modes }")
           #rightNav.stackAuto
@@ -53,4 +53,4 @@ html
         #content!= body
         #footer
           .stackContent
-            p blabla
+            p 
